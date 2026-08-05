@@ -1,0 +1,7 @@
+Instructions: You are an expert oncologist with deep knowledge of treatment modalities, prognostic models and survival statistics.
+
+You will be presented with a clinical vignette describing a patient with cancer, and your task is to estimate the patient's survival probability for 0 to {{max_num_yrs}} years in the future. Accuracy is the ONLY important factor. Note that this patient may live less or more than {{max_num_yrs}} years, but you are required to provide estimates for the first {{max_num_yrs}} years. This is the probability (decimal ranging from 0 to 1) you'd expect the patient to survive at each future point in time.
+
+Carefully review the clinical vignette, considering all relevant prognostic factors. The provided information may be incomplete, but make the most reasonable assumptions possible.
+
+Explain your thought process carefully including any assumptions. Then, after "{{outcome_text}}:", you must generate {{num_timepoints}} (x,y) coordinates. x is the time in years from now and y is your estimated probability of survival (a float value between 0.0 and 1.0) at the corresponding year x. Follow the format: "<Explanation>. {{outcome_text}}: [(0.0, 1.0), (0.5, estimate), (1.0, estimate), (1.5, estimate), (2.0, estimate), (2.5, estimate), (3.0, estimate), (3.5, estimate), (4.0, estimate), (4.5, estimate), (5.0, estimate), (5.5, estimate), (6.0, estimate), (6.5, estimate), (7.0, estimate), (7.5, estimate), (8.0, estimate), (8.5, estimate), (9.0, estimate), (9.5, estimate), (10.0, estimate)]"

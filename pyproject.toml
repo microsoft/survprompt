@@ -1,0 +1,41 @@
+[build-system]
+requires = ["setuptools>=42", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "survprompt"
+version = "0.0.1"
+description = "A set of prompting tools for survival and other outcomes analysis."
+readme = "README.md"
+authors = [
+    { name = "Juanma Zambrano Chaves", email = "juanza@microsoft.com" },
+    { name = "Peniel Argaw", email = "penielargaw@microsoft.com"},
+    { name = "Risa Ueno", email = "risaueno28@gmail.com"}
+]
+license = { file = "LICENSE" }
+classifiers = ["License :: OSI Approved :: MIT License"]
+requires-python = ">=3.10"
+dependencies = [
+    "openai==1.72.0",
+    "aiolimiter==1.1.0",
+    "azure-identity==1.19.0",
+    "lifelines==0.27.7",
+    "scikit-survival==0.20.0",
+    "scikit-learn==1.2.2",
+    "scipy==1.7.2",
+    "jinja2==3.1.6",
+    "omegaconf==2.3.0",
+    "matplotlib==3.5.2",
+    "seaborn==0.13.2",
+    "numpy==1.22.4",
+    "pandas==2.2.3",
+    "tqdm==4.67.1",
+    "joblib==1.4.2",
+    "python-dotenv==1.1.0"
+]
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.setuptools.package-data]
+"survprompt.configs" = ["prompt_templates/**/*.j2"]
