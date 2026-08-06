@@ -14,14 +14,17 @@ authors = [
 ]
 license = { file = "LICENSE" }
 classifiers = ["License :: OSI Approved :: MIT License"]
-requires-python = ">=3.10"
+# Pins below reproduce the environment used for the manuscript results.
+# scipy 1.7.2 has no wheels for Python 3.11+, hence the upper bound.
+requires-python = ">=3.10,<3.11"
 dependencies = [
     "openai==1.72.0",
     "aiolimiter==1.1.0",
-    "azure-identity==1.19.0",
+    "azure-identity==1.25.3",
     "lifelines==0.27.7",
     "scikit-survival==0.20.0",
-    "scikit-learn==1.5.0",
+    # Held at 1.2.2: scikit-survival 0.20.0 requires scikit-learn <1.3.
+    "scikit-learn==1.2.2",
     "scipy==1.7.2",
     "jinja2==3.1.6",
     "omegaconf==2.3.0",
@@ -31,7 +34,7 @@ dependencies = [
     "pandas==2.2.3",
     "tqdm==4.67.1",
     "joblib==1.4.2",
-    "python-dotenv==1.2.2"
+    "python-dotenv==1.1.0"
 ]
 
 [tool.setuptools.packages.find]
