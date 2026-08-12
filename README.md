@@ -10,7 +10,9 @@ This project is intended for research use. It is not a clinical device and shoul
 
 ## Requirements
 
-Survprompt has been tested with Python 3.10 on Ubuntu. The package dependencies are defined in `pyproject.toml` and are installed with the package.
+Survprompt has been developed and tested with Python 3.10 on Ubuntu 24.04.4 LTS. The package
+dependencies are pinned to the versions used for the manuscript results in `pyproject.toml`
+and are installed with the package.
 
 A conda environment is recommended:
 
@@ -29,35 +31,97 @@ cd survprompt
 pip install -e .
 ```
 
-## Configuration
+Typical install time is under a minute on a fast connection, longer on a slower link.
 
-Create a `.env` file in the repository root:
+## Demo
+
+A worked example on a small **synthetic** cohort, requiring no MSK-CHORD access and no Azure
+OpenAI credentials. The 200 records in [`demo/data/mskchord/`](demo/data/mskchord/) are
+generated, contain no real patient data, and do not reproduce any manuscript result.
+
+### Survival baselines
+
+Input is resolved as `$BASE_DIR/data/$DATA_NAME/{cancer}_dx_1st_seq_OS.csv`, so point
+`BASE_DIR` at the demo directory:
 
 ```bash
-BASE_DIR="/path/to/survprompt"
-INPUT_DIR="/path/to/input/data"
+export BASE_DIR="$PWD/demo"
 
-AZURE_OPENAI_ENDPOINT="your_endpoint"
-AZURE_OPENAI_API_VERSION="your_api_version"
-
-# Authenticate with either an API key...
-AZURE_OPENAI_API_KEY="your_api_key"
-# ...or Entra ID via the Azure CLI (`az login`), in which case leave the key unset.
-# Override the token scope only if your deployment sits behind a gateway that
-# exposes its own application ID URI.
-AZURE_OPENAI_TOKEN_SCOPE="https://cognitiveservices.azure.com/.default"
+python -m survprompt.experiments.experiments rsf_baseline --data_name mskchord --cancer_of_interest nsclc
+python -m survprompt.experiments.experiments cox_baseline --data_name mskchord --cancer_of_interest nsclc
 ```
 
-`BASE_DIR` should point to the repository root. `INPUT_DIR` should point to the directory containing the prepared MSK-CHORD input files.
+Each command logs its five cross-validation folds and writes predictions, c-index scores and
+fitted models under `demo/results/` (15 files per model). The recorded c-indices are:
 
-If `AZURE_OPENAI_API_KEY` is set it is used directly; otherwise the client falls back
-to Entra ID credentials from the Azure CLI.
+| Model | fold 0 | fold 1 | fold 2 | fold 3 | fold 4 | mean |
+|---|---|---|---|---|---|---|
+| `rsf_baseline` | 0.612 | 0.672 | 0.755 | 0.695 | 0.649 | **0.677** |
+| `cox_baseline` | 0.638 | 0.679 | 0.705 | 0.701 | 0.648 | **0.674** |
+
+Feature column order comes from Python `set` iteration, so the RSF mean moves by about
+± 0.005 between processes despite its fixed `random_state`; export `PYTHONHASHSEED=0` to
+reproduce the table exactly.
+
+### Prompt construction, without an API call
+
+Renders the clinical vignette and the exact prompts Survprompt would send to a model.
+Nothing is transmitted and no credentials are read:
+
+```bash
+python demo/render_prompt.py
+python demo/render_prompt.py --prompting_task TTE_OS --patient 7
+```
+
+It prints the patient's ground-truth outcome, the vignette, and the full system and user
+prompts:
+
+```
+The patient is a 65 years old White female with a history of smoking. The patient
+has been diagnosed with stage 4 non-squamous cell, adenocarcinoma non-small cell
+lung cancer (NSCLC). ...
+```
+
+### Expected run time
+
+Measured on Ubuntu 24.04 with `OMP_NUM_THREADS=4`.
+
+| Step | Time |
+|---|---|
+| `rsf_baseline` (5 folds, 1000 trees) | ~26 s |
+| `cox_baseline` (5 folds) | ~2 s |
+| `demo/render_prompt.py` | ~2 s |
+| `demo/make_demo_cohort.py` | < 1 s |
+
+## Configuration
+
+Copy [`.env.example`](.env.example) to `.env` in the repository root and fill it in.
+
+`BASE_DIR` is the important one: input data is read from beneath it, and all results, saved
+models and logs are written beneath it. `INPUT_DIR` is accepted by the baseline and ablation
+command-line entry points, but note that the `mskchord` data loader resolves input paths from
+`BASE_DIR`, not from `INPUT_DIR`.
+
+If `AZURE_OPENAI_API_KEY` is set it is used directly; otherwise the client falls back to
+Entra ID credentials from the Azure CLI. Neither is needed for the baselines or the demo.
 
 ## Data
 
-MSK-CHORD data access is managed by the dataset provider. Download the data from the MSK-CHORD data catalog and place the prepared files under the directory referenced by `INPUT_DIR`.
+MSK-CHORD data access is managed by the dataset provider. Download the data from the
+[MSK-CHORD data catalog](https://datacatalog.mskcc.org/dataset/11458) and place the prepared
+files where the loader expects them:
 
-The experiment code expects the supported cohort names used by the package, such as `nsclc`, `brca`, `crc`, `panc`, and `prostate`.
+```
+$BASE_DIR/data/mskchord/{cancer}_dx_1st_seq_OS.csv
+```
+
+with `{cancer}` one of `nsclc`, `brca`, `crc`, `panc`, `prostate`.
+
+To run on your own cohort, each row needs `PATIENT_ID`, `entry`, `stop` and `dead` (models
+are fitted on `stop - entry`), plus numeric feature columns as grouped in
+`survprompt.data.utils.FEATURE_TYPE_TO_COLS`. See
+[`demo/make_demo_cohort.py`](demo/make_demo_cohort.py) for a worked example that builds a
+valid file from scratch.
 
 ## Usage
 
@@ -108,6 +172,7 @@ The ablation runner resolves Survprompt runs through the experiment registry in 
 - `survprompt.baselines`: Random Survival Forest and Cox baseline model runners.
 - `survprompt.evaluation`: metrics for survival, calibration, and censored error, and support for survival-analysis utilities.
 - `survprompt.plots`: plotting utilities for experiment metrics, Kaplan-Meier curves, ablations, and error analysis.
+- `demo`: synthetic cohort, its generator, and a credential-free prompt rendering example.
 
 ## Citation
 
