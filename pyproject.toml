@@ -35,7 +35,7 @@ dependencies = [
     "tqdm==4.67.1",
     "joblib==1.4.2",
     "python-dotenv==1.1.0",
-    "setuptools==78.1.0"
+    "setuptools==83.0.0"
 ]
 
 [tool.setuptools.packages.find]
