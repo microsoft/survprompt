@@ -1,6 +1,6 @@
 # Survprompt
 
-[![Preprint](https://img.shields.io/badge/Preprint-Coming%20Soon-blue)](#citation)
+[![Preprint](https://img.shields.io/badge/Preprint-arXiv-blue)](https://arxiv.org/abs/2609.38181)
 [![Code License](https://img.shields.io/badge/Code%20License-MIT-green)](LICENSE)
 [![Data](https://img.shields.io/badge/MSK%20CHORD-Data-228B22)](https://datacatalog.mskcc.org/dataset/11458)
 
@@ -176,7 +176,9 @@ The ablation runner resolves Survprompt runs through the experiment registry in 
 
 ## Citation
 
-If you use Survprompt in research, cite the associated manuscript when available.
+If you use Survprompt in research, cite the associated manuscript:
+
+Chaves, J. M. Z., Argaw, P., Ueno, R., Bifulco, C., Young, K., Leidner, R., Naumann, T., & Poon, H. (2026). Large Language Models are Approximate Survival Estimators. arXiv. https://doi.org/10.48550/arxiv.2609.38181
 
 ## Contributing
 
